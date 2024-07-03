@@ -242,3 +242,28 @@ FROM package_prefixes
 WHERE 'django-' || LOWER(prefix) = package_name
    OR 'django-' || LOWER(REPLACE(prefix, '_', '-')) = package_name;
 ```
+
+```
+SELECT COUNT(*)
+FROM package_prefixes pp
+WHERE pp.package_name = 'apache-' || REPLACE(REPLACE(LOWER(pp.prefix), "_", "-"), '/', '-')
+  AND NOT EXISTS (
+    SELECT 1
+    FROM package_prefixes pp2
+    WHERE pp2.package_name = pp.package_name
+      AND pp2.prefix != pp.prefix
+  )
+```
+
+```
+SELECT COUNT(*)
+FROM package_prefixes pp
+WHERE pp.package_name = REPLACE(REPLACE(LOWER(pp.prefix), "_", "-"), '/', '-')
+  AND pp.prefix LIKE "%/%"
+  AND NOT EXISTS (
+    SELECT 1
+    FROM package_prefixes pp2
+    WHERE pp2.package_name = pp.package_name
+      AND pp2.prefix != pp.prefix
+  )
+```
