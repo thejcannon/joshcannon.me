@@ -28,10 +28,10 @@ Well, that's exactly what I needed to find out for my hobby project, so hop in! 
 
 ## Step 1: We need data
 
-Hugo van Kemenade, has [this list](https://hugovk.github.io/top-pypi-packages/) 
+Hugo van Kemenade has [this list](https://hugovk.github.io/top-pypi-packages/) 
 of the top 8000 most downloaded packages on PyPI, updated monthly. That was easy (Thanks Hugo!).
 
-PyPI has [a nice simple API](https://wiki.python.org/moin/PyPISimple) (no quite literally) for
+PyPI has [a nice simple API](https://wiki.python.org/moin/PyPISimple) (quite literally) for
 getting links to downloadables for a package.
 
 `pip` wants to extract METADATA out of wheels (which are just zips) without downloading the 
@@ -43,14 +43,14 @@ Swirl all that in a big pot, and voila! You can quickly scrape PyPI to get each 
 ## Step 2: That was too easy, let's add some complexity
 
 Since getting data was kinda easy, the universe has evened things out by making analyzing that data
-(in a useful way) kinda hard. That's because of two reasons:
+(in a useful way) kinda hard. That's for two reasons:
 
 1. Source distributions (sdists, as opposed to binary ones, bdists) go through a build process.
    That means there is only a loose relationship between the files inside them and the files that
    would be inside a built distribution (part of that build process could be moving or creating files).
    There are 658 sdist-only packages on the list.
 3. Namespace packages. Namespaces might've been "one honking great idea" but namespace _packages_
-   are usually misunderstood and a honking painful thing to have to remember.
+   are usually misunderstood, and a honking painful thing to have to remember.
 
 The solution to 1. is easy, just build (most of) them myself (how I did this is worthy of a blog post to come).
 
@@ -122,7 +122,7 @@ These prefixes are calculated by:
 
 - Take the filepaths for a package
 - Remove any `__init__.py` files that are namespace packages
-- Calculate the lowest common ancestor amoung the Python files
+- Calculate the lowest common ancestor among the Python files
 
 The intent is to try and find unambiguous prefixes for each package.
 
@@ -136,7 +136,7 @@ Of 16,681 total package/prefix combos (with 16,177 distinct prefixes):
   - (In fact most of the high-prefixers are due to a lack of `__init__.py`)
   - [So if we filter out prefixes of multiple depths](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+package_name%2C+%0A+++++++COUNT%28prefix%29+as+prefix_count%2C%0A+++++++GROUP_CONCAT%28prefix%29+as+prefixes%0AFROM+package_prefixes%0AWHERE+prefix+NOT+LIKE+%22%25%2F%25%22%0AGROUP+BY+package_name%0AORDER+BY+prefix_count+DESC)
     - `timedelta` now tops the charts with __130 unique prefixes__
-    - It (and it's friends near the top of the chart) all appear to be a snafu
+    - It (and its friends near the top of the chart) all appear to be a snafu
       and didn't intend to include several dozens of directories in the wheel.
 - [360 prefixes are shared by more than one package](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+p1.prefix%2C+GROUP_CONCAT%28p1.package_name%29+AS+packages%0AFROM+package_prefixes+p1%0AJOIN+package_prefixes+p2+ON+p1.prefix+%3D+p2.prefix+AND+p1.package_name+%21%3D+p2.package_name%0AGROUP+BY+p1.prefix%0AORDER+BY+p1.prefix)
   - However, just like shared filepaths, it appears these are largely from packages
@@ -165,7 +165,7 @@ the module name:
     - E.g. `flufl.lock` -> `flufl-lock`
  - [Then 52 more with an `apache-` prefix](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+%27apache-%27+%7C%7C+REPLACE%28REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%2C+%27%2F%27%2C+%27-%27%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0A++AND+prefix+LIKE+%22%25%2F%25%22%0AORDER+BY+pp.package_name+DESC)
 
-So sticking solely to normalization, and applying some common prefixes/suffixes...
+So sticking solely to normalization, and applying some common prefixes/suffixes, you get...
 
 __81% of packages__ have a single prefix, which when normalized directly correlates to the package name.
 
@@ -177,13 +177,13 @@ package name -> module name conventions
 But we've turned hunch into proof, and more importantly we can also compile a little mapping
 of the top packages' prefixes that _don't_ fit the mold.
 
-If you're already, or planning to, publish packages to PyPI, be a peach:
+If you're already publishing packages to PyPI, or planning to do so, be a peach::
 
 - Stick to a convention for your module names
 - Upload wheels
 - Avoid implicit or explicit namespace packages if you can help it
   - Otherwise, if you have to choose... well, you know the saying ;)
 
-I'll probably run this collection periodically, and maybe even evolve it some. However,
-now I can get back to my hobby project, (and also my hobby project's hobby project (this)'s
-hobby project (building wheels where missing)).
+I'll probably run this collection periodically, and maybe even evolve it some.
+However, now I can get back to my hobby project (as well as this hobby project's
+hobby project: building wheels where missing)..
