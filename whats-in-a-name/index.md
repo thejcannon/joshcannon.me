@@ -44,9 +44,9 @@ Swirl all that in a big pot, and voila! You can quickly scrape PyPI to get each 
 Since getting data was kinda easy, the universe has evened things out by making analyzing that data
 in a useful way kinda hard. That's because of two reasons:
 
-1. Source distributions (sdists, as opposed to binary ones, bdists) go through a build process. That means there is
-   only a loose relationship between the files inside them and the files that would be inside a built
-   distribution (part of that that build process could be moving or creating files).
+1. Source distributions (sdists, as opposed to binary ones, bdists) go through a build process.
+   That means there is only a loose relationship between the files inside them and the files that
+   would be inside a built distribution (part of that that build process could be moving or creating files).
    There are 658 sdist-only packages on the list.
 3. Namespace packages. Namespaces might've been "one honking great idea" but namespace _packages_
    are usually misunderstood and a honking painful thing to have to remember.
@@ -92,7 +92,8 @@ This table is a simple "what Python files of valid importable names are in the z
   - and `oci` with 12,778 files
 - [There are 802 packages with only a single file](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+%28%0A++++SELECT+package_name%0A++++FROM+filepaths%0A++++GROUP+BY+package_name%0A++++HAVING+COUNT%28filepath%29+%3D+1%0A%29)
 - [There are 210 packages which include a top-level `test` or `tests` directory](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28DISTINCT+package_name%29+FROM+filepaths%0AWHERE+filepath+LIKE+%22test%2F%25%22+%0AOR+filepath+LIKE+%22tests%2F%25%22)
-  - (This can get annoying if your Python set up finds these before finding your tests directory, as your tests won't be importable)
+  - (This can get annoying if your Python set up finds these before finding your tests directory,
+    as your tests won't be importable)
 
 ### Fun with the `namespace_packages` table
 
@@ -104,8 +105,8 @@ Out of 8,829 candidate package/filepath combinations:
 - [Only 180 of the 8,829 are explicit namespace packages](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=select+COUNT%28filepath%29+from+namespace_packages+WHERE+is_namespace+%3D+1)
   representing only [91 distinct filepaths](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=select+COUNT%28DISTINCT+filepath%29+from+namespace_packages+WHERE+is_namespace+%3D+1)
 - [63 filepaths are marked as a namespace package in one package, but not in another](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+%28%0A++++SELECT+filepath%0A++++FROM+namespace_packages%0A++++GROUP+BY+filepath%0A++++HAVING+COUNT%28DISTINCT+is_namespace%29+%3D+2%0A%29)
-  - Virtually all of these are from packages which have undergone some kind of migration, and therefore the colliding
-    packages shouldn't be installed at the same time anyways.
+  - Virtually all of these are from packages which have undergone some kind of migration,
+    and therefore the colliding packages shouldn't be installed at the same time anyways.
 - [3320 filepaths appeared in multiple packages and _weren't_ marked as namespace packages](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29+FROM+%28%0A++SELECT+DISTINCT+filepath%0A++FROM+namespace_packages%0A++WHERE+is_namespace+%3D+0%0A++GROUP+BY+filepath%0A++HAVING+COUNT%28DISTINCT+package_name%29+%3E+1%0A%29)
   - From [scrolling the data](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+filepath%2C+%0A+++++++GROUP_CONCAT%28DISTINCT+package_name%29+AS+package_names%0AFROM+namespace_packages%0AWHERE+is_namespace+%3D+0%0AGROUP+BY+filepath%0AHAVING+COUNT%28DISTINCT+package_name%29+%3E+1)
     it appears these are largely from packages which are alternates (or forks) of other packages.
@@ -135,7 +136,8 @@ Of 16,681 total package/prefix combos (with 16,177 distinct prefixes):
     - It (and it's friends near the top of the chart) all appear to be a snafu
       and didn't intend to include several dozens of directories in the wheel.
 - [360 prefixes are shared by more than one package](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+p1.prefix%2C+GROUP_CONCAT%28p1.package_name%29+AS+packages%0AFROM+package_prefixes+p1%0AJOIN+package_prefixes+p2+ON+p1.prefix+%3D+p2.prefix+AND+p1.package_name+%21%3D+p2.package_name%0AGROUP+BY+p1.prefix%0AORDER+BY+p1.prefix)
-  - However, just like shared filepaths, it appears these are largely from packages which are alternates (or forks) of other packages.
+  - However, just like shared filepaths, it appears these are largely from packages
+    which are alternates (or forks) of other packages.
   - Some are legimate though, like `haystack` being a prefix of both `django-haystack` and `haystack-ai`
 
 ## Step 4: Funtime is over, let's find conventions
@@ -166,4 +168,13 @@ __81% of packages__ have a single prefix, which when normalized directly correla
 
 # Conclusion, and next steps
 
-TODO
+So here we are. Sitting on a pile of data, and a concrete understanding of 
+package name -> module name conventions 
+(which I'm sure most of y'all reading already had on your BINGO card). 
+But we've turned hunch into proof, and more important we can also compile a little mapping
+of the top packages' prefixes that _don't_ fit the mold.
+
+I'll probably run this collection periodicially, and maybe even evolve it some. However,
+now I can get back to my hobby project, (and also my hobby project's hobby project (this)'s
+hobby project (building wheels where missing)).
+
