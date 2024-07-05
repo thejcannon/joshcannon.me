@@ -163,7 +163,7 @@ the module name:
 
 So sticking solely to normalization, and applying some common prefixes/suffixes...
 
-81% of packages have a single prefix, which when normalized directly correlates to the package name.
+__81% of packages__ have a single prefix, which when normalized directly correlates to the package name.
 
 # Conclusion, and next steps
 
