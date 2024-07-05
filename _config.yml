@@ -22,5 +22,11 @@ social-network-links:
 
 remote_theme: daattali/beautiful-jekyll@6.0.1
 plugins:
-  - github-pages
   - jekyll-feed
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      before-content: post_layout.html
