@@ -46,18 +46,18 @@ in a useful way kinda hard. That's because of two reasons:
 
 1. Source distributions (sdists, as opposed to binary ones, bdists) go through a build process. That means there is
    only a loose relationship between the files inside them and the files that would be inside a built
-   distribution (part of that that build process could be moving, moving, or creating files).
+   distribution (part of that that build process could be moving or creating files).
    There are 658 sdist-only packages on the list.
 3. Namespace packages. Namespaces might've been "one honking great idea" but namespace _packages_
    are usually misunderstood and a honking painful thing to have to remember.
 
-The solution to 1. is easy, let's ignore them.
+The solution to 1. is easy, just build (most of) them myself (how I did this is worthy of a blog post to come).
 
 The solution to 2. is annoyingly complex. Namespace packages come in two forms:
 
 1. Implicit namespace packages. These are the reason you can `mkdir foo`, then `import foo` even though
    there's no `__init__.py` in it. Any directory can be imported without a `__init__.py` and is treated as
-   an _implicit_ namespace packages. That's a daily annoyance for me, but in this case its actually preferable.
+   an _implicit_ namespace packages. That's a daily annoyance for me, but in this case its actually easier to handle.
 2. Explicit namespace packages. These have a `__init__.py` with one or two magic incantations that basically say
    "I'm a namespace". And they can't/shouldn't have much more.
 
@@ -67,203 +67,104 @@ both `opencensus` and `opencensus-context` and `opencensus-ext-azure` would all 
 So, for any `__init__.py` whose path shows up in more than one package, we need to see if it contains one of the
 magic incantations.
 
-## Step 3: Let's have fun
+## Step 3: Let's have fun with data
 
-So, of the 7258 packages (663 sdists, and 3 bdists of weird extensions, and 79 packages with no valid Python files) scraped...
+([Link to online `datasette`](lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite))
 
-### Oops
+So, of the 7,893 packages scraped:
 
-The most common prefixes[^1] are:
+- [7,337 wheels were found on PyPI](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29+FROM+packages%0AWHERE+url+LIKE+%22%25pythonhosted.org%25%22)
+- [I built another 556](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29+FROM+packages%0AWHERE+url+LIKE+%22%25github.com%25%22)
+- [But 217 packages didn't have an importable file](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+packages+p%0ALEFT+JOIN+filepaths+f+ON+p.package_name+%3D+f.package_name%0AWHERE+f.package_name+IS+NULL%0AORDER+BY+p.package_name)
+  - Most of these are `types-` or `-stubs`
+  - Some were "meta" packages that just contained requirements on other packages
 
-```
-tests|111
-test|34
-nvidia|22
-examples|10
-docs/conf|9
-benchmarks|5
-docs|5
-__init__|4
-cv2|4
-docs/source/conf|4
-```
+Which leaves us with 7676 packages to analyze.
 
-Which is slightly annoying that installation of over 100 packages might take "place" of the top-level `tests` module name,
-depending on how I structure my project.
+### Fun with the `filepaths` table
 
-For the rest of the statstics, we'll pretend the following prefixes don't exist: `setup`, `test`, `tests`, `doc`, `docs`, `examples`, `benchmarks`, `scripts`, etc...
+This table is a simple "what Python files of valid importable names are in the zip?"
 
-### Conventions
+- [Sorting by filecount, descending](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+package_name%2C+COUNT%28filepath%29+AS+filepath_count%0AFROM+filepaths%0AGROUP+BY+package_name%0AORDER+BY+filepath_count+DESC)
+  shows us: 
+  - `ansible` tops the chart with 13,650 files,
+  - followed by `plotly` at 13,443 files,
+  - and `oci` with 12,778 files
+- [There are 802 packages with only a single file](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+%28%0A++++SELECT+package_name%0A++++FROM+filepaths%0A++++GROUP+BY+package_name%0A++++HAVING+COUNT%28filepath%29+%3D+1%0A%29)
+- [There are 210 packages which include a top-level `test` or `tests` directory](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28DISTINCT+package_name%29+FROM+filepaths%0AWHERE+filepath+LIKE+%22test%2F%25%22+%0AOR+filepath+LIKE+%22tests%2F%25%22)
+  - (This can get annoying if your Python set up finds these before finding your tests directory, as your tests won't be importable)
 
-TODO: Lowercase the prefix for these
+### Fun with the `namespace_packages` table
 
-- 3330 packages are identified by a prefix which is the normalized package name. E.g. (`requests` -> `requests`)
-   - 3089 of those packages are _uniquely_ identified by that single prefix. (Meaning they have no other prefix).
-     - E.g. `pytest`-the-package is identified by `pytest`-the-module, so it meets criteria one. But `pytest`-the-package
-       also has the prefix of `_pytest` (anf `py`), so it doesn't meet criteria two.
-- Similarly, if we replaced hypens with underscores we'd add another 2166. Hyphens to path separators adds 381
-   (if you were wondering which was more popular).
-   - E.g. `typing-extensions` -> `typing_extensions` and `zope-browser` -> `zope/browser`, respectively
-   - 2089 and 326 for _uniquely_ prerfixed, respectively.
+These filepaths are `__init__.py` filepaths found in >1 package.
 
-(TODO: Also do replacing `'-'` with `''` (just smush it together)
+Out of 8,829 candidate package/filepath combinations:
 
-So that leaves us with 2119 packages (7994 - 3330 - 2166 - 381) that don't follow the simple convention.
+- [There are 3408 distinct filepaths](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=select+COUNT%28DISTINCT+filepath%29+from+namespace_packages)
+- [Only 180 of the 8,829 are explicit namespace packages](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=select+COUNT%28filepath%29+from+namespace_packages+WHERE+is_namespace+%3D+1)
+  representing only [91 distinct filepaths](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=select+COUNT%28DISTINCT+filepath%29+from+namespace_packages+WHERE+is_namespace+%3D+1)
+- [63 filepaths are marked as a namespace package in one package, but not in another](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+%28%0A++++SELECT+filepath%0A++++FROM+namespace_packages%0A++++GROUP+BY+filepath%0A++++HAVING+COUNT%28DISTINCT+is_namespace%29+%3D+2%0A%29)
+  - Virtually all of these are from packages which have undergone some kind of migration, and therefore the colliding
+    packages shouldn't be installed at the same time anyways.
+- [3320 filepaths appeared in multiple packages and _weren't_ marked as namespace packages](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29+FROM+%28%0A++SELECT+DISTINCT+filepath%0A++FROM+namespace_packages%0A++WHERE+is_namespace+%3D+0%0A++GROUP+BY+filepath%0A++HAVING+COUNT%28DISTINCT+package_name%29+%3E+1%0A%29)
+  - From [scrolling the data](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+filepath%2C+%0A+++++++GROUP_CONCAT%28DISTINCT+package_name%29+AS+package_names%0AFROM+namespace_packages%0AWHERE+is_namespace+%3D+0%0AGROUP+BY+filepath%0AHAVING+COUNT%28DISTINCT+package_name%29+%3E+1)
+    it appears these are largely from packages which are alternates (or forks) of other packages.
+ - [the deepest namespace packages are](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+DISTINCT+filepath%0AFROM+namespace_packages%0AWHERE+is_namespace+%3D+1%0AORDER+BY+LENGTH%28filepath%29+-+LENGTH%28REPLACE%28filepath%2C+%27%2F%27%2C+%27%27%29%29+DESC)
+   - `aws_cdk/aws_cloudfront/experimental` and `azureml/train/automl` at 3 directories deep
 
-Perhaps there's just more conventions we should uncover?
+### Fun with the `prefixes` table
 
-### More Conventions - Prefixes and suffixes
+These prefixes are calculated by:
 
-- Of 134 packages which start with `types-`, 119 of them have a `-stubs` suffixed prefix.
-  - These really shouldn't be imported, so we can just ignore all `types-` packages
-- 68 packages/prefix combinations have `py` prefixing the package name (e.g. `pyusb` -> `usb`)
-- 88 have a `python-` prefix
-- 121 have a `django-` prefix
-- 141 have a `pyobjc-framework` prefix
-- 52 look like `apache-airflow-providers-*` -> `airflow/providers/*`
-- 54 look like `aws-cdk-aws-*` -> `aws_cdk/aws_*/_jsii` [^9]
-- TODO: `scikit` -> `sk*`
-- TODO: `robotframework`
+- Take the filepaths for a package
+- Remove any `__init__.py` files that are namespace packages
+- Calculate the lowest common ancestor amoung the Python files
 
-# Working our way back
+The intent is to try and find unambiguous prefixes for each package.
 
-So, you may remember I wanted to map module names to package names.
-Let's see how successful applying these handful of conventions would net me.
+Of 16,681 total package/prefix combos (with 16,177 distinct prefixes):
 
-Of 9940 prefixes,
+- [7147 packages have one prefix](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+%28%0A++++SELECT+package_name%0A++++FROM+package_prefixes%0A++++GROUP+BY+package_name%0A++++HAVING+COUNT%28prefix%29+%3D+1%0A%29)
+- [On the other end, sorting packages by prefix count reveals](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+package_name%2C+COUNT%28prefix%29+AS+prefix_count%0AFROM+package_prefixes%0AGROUP+BY+package_name%0AORDER+BY+prefix_count+DESC)
+  - `ansible` tops the charts with 5,915 prefixes
+    - This is because there are _a lot_ of nested directories with only one Python file in them and no `__init__.py`,
+      making that a "unique" prefix.
+  - (In fact most of the high-prefixers are due to a lack of `__init__.py`)
+  - [So if we filter out prefixes of multiple depths](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+package_name%2C+%0A+++++++COUNT%28prefix%29+as+prefix_count%2C%0A+++++++GROUP_CONCAT%28prefix%29+as+prefixes%0AFROM+package_prefixes%0AWHERE+prefix+NOT+LIKE+%22%25%2F%25%22%0AGROUP+BY+package_name%0AORDER+BY+prefix_count+DESC)
+    - `timedelta` now tops the charts with __130 unique prefixes__
+    - It (and it's friends near the top of the chart) all appear to be a snafu
+      and didn't intend to include several dozens of directories in the wheel.
+- [360 prefixes are shared by more than one package](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+p1.prefix%2C+GROUP_CONCAT%28p1.package_name%29+AS+packages%0AFROM+package_prefixes+p1%0AJOIN+package_prefixes+p2+ON+p1.prefix+%3D+p2.prefix+AND+p1.package_name+%21%3D+p2.package_name%0AGROUP+BY+p1.prefix%0AORDER+BY+p1.prefix)
+  - However, just like shared filepaths, it appears these are largely from packages which are alternates (or forks) of other packages.
+  - Some are legimate though, like `haystack` being a prefix of both `django-haystack` and `haystack-ai`
 
-- `package_name = module.lower().replace("_", "-")` -> handles 5590 prefixes (56%) [^10]
-- otherwise, try `f"python-{package_name}"` -> 89 more
-- otherwise, try `f"py{package_name}"` -> 72 more
-- otherwise, try `f"django-{package_name}"` -> 121 more
-- otherwise, try `f"django-{package_name}"` -> 141 more
+## Step 4: Funtime is over, let's find conventions
 
-Brings us to 60.5%.
+By far, the most common convention is (unsuprisingly) [normalizing](https://packaging.python.org/en/latest/specifications/name-normalization/#name-normalization)
+the module name:
 
----
+- [5,551 prefixes map to their package name after normalization](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0AORDER+BY+pp.package_name+DESC)
+  - E.g. `requests` -> `requests` or `sqlalchemy_views` -> `sqlalchemy-views` or `ShazamAPI` -> `shazamapi`
+  - [Of those, 5,303 prefixes _solely_ identify their package](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESC)
+    - E.g. `pytest` wouldn't count because `_pytest` and `py` are also prefixes.
+    - __That's almost 70% of packages!__
+- There are a few common prefixes/suffixes, too (numbers are packages with 1 prefix):
+  - [`python-` prefix adds 84](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+%27python-%27+%7C%7C+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESC),
+  [`-python` suffix adds 22](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29+%7C%7C+%27-python%27%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESCZ)
+  - [`py` prefix adds 62](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+%27py%27+%7C%7C+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESC),
+    [`-py` suffix adds 33](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29+%7C%7C+%27-py%27%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESC)
+  - [`django-` prefix adds 115](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+%27django-%27+%7C%7C+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESC)
+  - [`django-` prefix adds 115](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+%27django-%27+%7C%7C+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESC)
+  - [`pyobjc-framework-` prefix adds 135](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+%27pyobjc-framework-%27+%7C%7C+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0AORDER+BY+pp.package_name+DESC)
+- Then for multi-level prefixes:
+  - [441 more are found by replacing the `.` with `-`](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+REPLACE%28REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%2C+%27%2F%27%2C+%27-%27%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0A++AND+prefix+LIKE+%22%25%2F%25%22%0AORDER+BY+pp.package_name+DESC)
+    - E.g. `flufl.lock` -> `flufl-lock`
+ - [Then 52 more with an `apache-` prefix](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+%27apache-%27+%7C%7C+REPLACE%28REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%2C+%27%2F%27%2C+%27-%27%29%0A++AND+NOT+EXISTS+%28%0A++++SELECT+1%0A++++FROM+package_prefixes+pp2%0A++++WHERE+pp2.package_name+%3D+pp.package_name%0A++++++AND+pp2.prefix+%21%3D+pp.prefix%0A++%29%0A++AND+prefix+LIKE+%22%25%2F%25%22%0AORDER+BY+pp.package_name+DESC)
 
-[^1]: Query
-      ```sql
-      SELECT prefix, COUNT(*) as count
-      FROM package_prefixes
-      GROUP BY prefix
-      ORDER BY count DESC
-      LIMIT 10;
-      ```
+So sticking solely to normalization, and applying some common prefixes/suffixes...
 
-[^3]: Query
-      ```sql
-      SELECT COUNT(*) as matching_packages
-      FROM packages p
-      JOIN package_prefixes pp ON p.package_name = pp.package_name
-      WHERE pp.prefix = p.package_name;
-      ```
+81% of packages have a single prefix, which when normalized directly correlates to the package name.
 
-[^4]: Query
-      ```sql
-      WITH matching_packages AS (
-          SELECT p.package_name
-          FROM packages p
-          JOIN package_prefixes pp ON p.package_name = pp.package_name
-          WHERE pp.prefix = p.package_name
-      ),
-      prefix_counts AS (
-          SELECT package_name, COUNT(*) as prefix_count
-          FROM package_prefixes
-          GROUP BY package_name
-      )
-      SELECT COUNT(*) as single_prefix_packages
-      FROM matching_packages mp
-      JOIN prefix_counts pc ON mp.package_name = pc.package_name
-      WHERE pc.prefix_count = 1;
-      ```
+# Conclusion, and next steps
 
-[^6]: Query
-      ```sql
-      SELECT p.package_name,
-             GROUP_CONCAT(pp.prefix) AS prefixes
-      FROM packages p
-      LEFT JOIN package_prefixes pp ON p.package_name = pp.package_name
-      WHERE NOT EXISTS (
-          SELECT 1
-          FROM package_prefixes pp2
-          WHERE pp2.package_name = p.package_name
-          AND (
-              pp2.prefix = REPLACE(p.package_name, '-', '_')
-              OR
-              pp2.prefix = REPLACE(p.package_name, '-', '/')
-          )
-      )
-      GROUP BY p.package_name
-      HAVING prefixes IS NOT NULL;
-      ```
-
-[^7]: Query
-      ```sql
-      SELECT COUNT(DISTINCT package_name)
-      FROM package_prefixes
-      WHERE package_name LIKE "types-%"
-        AND prefix LIKE "%-stubs"
-        AND substr(package_name, 7) = substr(prefix, 1, length(prefix) - 6)
-      ```
-
-[^8]: Query
-      ```sql
-      SELECT p.package_name, pp.prefix
-      FROM packages p
-      JOIN package_prefixes pp ON p.package_name = pp.package_name
-      WHERE p.package_name LIKE 'py%'
-        AND (pp.prefix = SUBSTR(p.package_name, 3)
-             OR pp.prefix = REPLACE(SUBSTR(p.package_name, 3), '-', '_')
-             OR pp.prefix = REPLACE(SUBSTR(p.package_name, 3), '-', '/'));
-      ```
-
-[^9]: Query
-      ```sql
-      SELECT COUNT(*)
-      FROM packages p
-      JOIN package_prefixes pp ON p.package_name = pp.package_name
-      WHERE p.package_name LIKE 'aws-cdk-aws-%'
-        AND pp.prefix = 'aws_cdk/' || REPLACE(SUBSTR(p.package_name, 9), '-', '_') || '/_jsii';
-      ```
-
-[^10]: Query
-      ```sql
-      SELECT COUNT(*) as matching_packages
-      FROM packages p
-      JOIN package_prefixes pp ON p.package_name = pp.package_name
-      WHERE LOWER(pp.prefix) = p.package_name
-      OR LOWER(REPLACE(pp.prefix, "_", "-")) = p.package_name
-      ```
-
-```
-SELECT COUNT(DISTINCT package_name)
-FROM package_prefixes
-WHERE 'django-' || LOWER(prefix) = package_name
-   OR 'django-' || LOWER(REPLACE(prefix, '_', '-')) = package_name;
-```
-
-```
-SELECT COUNT(*)
-FROM package_prefixes pp
-WHERE pp.package_name = 'apache-' || REPLACE(REPLACE(LOWER(pp.prefix), "_", "-"), '/', '-')
-  AND NOT EXISTS (
-    SELECT 1
-    FROM package_prefixes pp2
-    WHERE pp2.package_name = pp.package_name
-      AND pp2.prefix != pp.prefix
-  )
-```
-
-```
-SELECT COUNT(*)
-FROM package_prefixes pp
-WHERE pp.package_name = REPLACE(REPLACE(LOWER(pp.prefix), "_", "-"), '/', '-')
-  AND pp.prefix LIKE "%/%"
-  AND NOT EXISTS (
-    SELECT 1
-    FROM package_prefixes pp2
-    WHERE pp2.package_name = pp.package_name
-      AND pp2.prefix != pp.prefix
-  )
-```
+TODO
