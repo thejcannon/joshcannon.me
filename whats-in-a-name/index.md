@@ -171,10 +171,16 @@ __81% of packages__ have a single prefix, which when normalized directly correla
 So here we are. Sitting on a pile of data, and a concrete understanding of 
 package name -> module name conventions 
 (which I'm sure most of y'all reading already had on your BINGO card). 
-But we've turned hunch into proof, and more important we can also compile a little mapping
+But we've turned hunch into proof, and more importantly we can also compile a little mapping
 of the top packages' prefixes that _don't_ fit the mold.
+
+If you're already, or planning to, publish packages to PyPI, be a peach:
+
+- Stick to a convention for your module names
+- Upload wheels
+- Avoid implciit or explicit namespace packages if you can help it
+  - Otherwise, if you have to choose... well, you know the saying ;)
 
 I'll probably run this collection periodicially, and maybe even evolve it some. However,
 now I can get back to my hobby project, (and also my hobby project's hobby project (this)'s
 hobby project (building wheels where missing)).
-
