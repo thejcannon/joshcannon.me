@@ -1,0 +1,5 @@
+.anchor {
+    transition: color 0.3s ease;
+    color: #E0CBA8;
+    font-size: 0.8em;
+}

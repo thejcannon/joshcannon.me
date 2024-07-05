@@ -29,4 +29,5 @@ defaults:
       path: ""
       type: "posts"
     values:
+      head-extra: post_head_extra.html
       before-content: post_layout.html
