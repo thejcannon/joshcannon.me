@@ -70,7 +70,7 @@ magic incantations.
 
 ## Step 3: Let's have fun with data
 
-([Link to online `datasette`](lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite)
+([Link to online `datasette`](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite)
 which all of the following links will use. I can't guarantee, however, the schema won't change.
 )
 
