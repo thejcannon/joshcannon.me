@@ -6,11 +6,11 @@ excerpt: "Inspecting filenames of PyPI packages."
 # Background
 
 Naming is important (as well as hard). Good names are good. Bad names are... bad.
-And we name a lot of things. In Python (a name) code is budled and uploaded as a package 
+And we name a lot of things. In Python (a name) code is bundled and uploaded as a package 
 (another name), usually to the Python Package Index (PyPI, a third name). Inside of these
 packages is code. Most commonly, Python code (but they truly can contain anything).
 The only relationship between the package name and the module name(s) is the same as the 
-relationship as between a cat's name and its demeanor. _Usually_ "fluffy" is a fluffy cat,
+relationship between a cat's name and its demeanor. _Usually_ "fluffy" is a fluffy cat,
 but it's a convention. "Cupcake" could be the name of a very very naughty kitten.
 
 You install `requests` and import `requests`. You install `typing-extensions` and import
@@ -31,7 +31,7 @@ Hugo van Kemenade, has [this list](https://hugovk.github.io/top-pypi-packages/)
 of the top 8000 most downloaded packages on PyPI, updated monthly. That was easy (Thanks Hugo!).
 
 PyPI has [a nice simple API](https://wiki.python.org/moin/PyPISimple) (no quite literally) for
-gettings links to downloadables for a package.
+getting links to downloadables for a package.
 
 `pip` wants to extract METADATA out of wheels (which are just zips) without downloading the 
 entire thing, so it has some [clever code](https://github.com/pypa/pip/blob/main/src/pip/_internal/network/lazy_wheel.py)
@@ -42,11 +42,11 @@ Swirl all that in a big pot, and voila! You can quickly scrape PyPI to get each 
 ## Step 2: That was too easy, let's add some complexity
 
 Since getting data was kinda easy, the universe has evened things out by making analyzing that data
-in a useful way kinda hard. That's because of two reasons:
+(in a useful way) kinda hard. That's because of two reasons:
 
 1. Source distributions (sdists, as opposed to binary ones, bdists) go through a build process.
    That means there is only a loose relationship between the files inside them and the files that
-   would be inside a built distribution (part of that that build process could be moving or creating files).
+   would be inside a built distribution (part of that build process could be moving or creating files).
    There are 658 sdist-only packages on the list.
 3. Namespace packages. Namespaces might've been "one honking great idea" but namespace _packages_
    are usually misunderstood and a honking painful thing to have to remember.
@@ -61,7 +61,7 @@ The solution to 2. is annoyingly complex. Namespace packages come in two forms:
 2. Explicit namespace packages. These have a `__init__.py` with one or two magic incantations that basically say
    "I'm a namespace". And they can't/shouldn't have much more.
 
-Because of 2., if I was to try and find what common "prefixes" a package has by simplying looking at filenames,
+Because of 2., if I was to try and find what common "prefixes" a package has by simply looking at filenames,
 both `opencensus` and `opencensus-context` and `opencensus-ext-azure` would all claim `opencensus`.
 
 So, for any `__init__.py` whose path shows up in more than one package, we need to see if it contains one of the
@@ -69,7 +69,9 @@ magic incantations.
 
 ## Step 3: Let's have fun with data
 
-([Link to online `datasette`](lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite))
+([Link to online `datasette`](lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite)
+which all of the following links will use. I can't guarantee, however, the schema wont' change.
+)
 
 So, of the 7,893 packages scraped:
 
@@ -138,11 +140,11 @@ Of 16,681 total package/prefix combos (with 16,177 distinct prefixes):
 - [360 prefixes are shared by more than one package](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+p1.prefix%2C+GROUP_CONCAT%28p1.package_name%29+AS+packages%0AFROM+package_prefixes+p1%0AJOIN+package_prefixes+p2+ON+p1.prefix+%3D+p2.prefix+AND+p1.package_name+%21%3D+p2.package_name%0AGROUP+BY+p1.prefix%0AORDER+BY+p1.prefix)
   - However, just like shared filepaths, it appears these are largely from packages
     which are alternates (or forks) of other packages.
-  - Some are legimate though, like `haystack` being a prefix of both `django-haystack` and `haystack-ai`
+  - Some are legitimate though, like `haystack` being a prefix of both `django-haystack` and `haystack-ai`
 
 ## Step 4: Funtime is over, let's find conventions
 
-By far, the most common convention is (unsuprisingly) [normalizing](https://packaging.python.org/en/latest/specifications/name-normalization/#name-normalization)
+By far, the most common convention is (unsurprisingly) [normalizing](https://packaging.python.org/en/latest/specifications/name-normalization/#name-normalization)
 the module name:
 
 - [5,551 prefixes map to their package name after normalization](https://lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite#/package_database?sql=SELECT+COUNT%28*%29%0AFROM+package_prefixes+pp%0AWHERE+pp.package_name+%3D+REPLACE%28LOWER%28pp.prefix%29%2C+%22_%22%2C+%22-%22%29%0AORDER+BY+pp.package_name+DESC)
@@ -178,9 +180,9 @@ If you're already, or planning to, publish packages to PyPI, be a peach:
 
 - Stick to a convention for your module names
 - Upload wheels
-- Avoid implciit or explicit namespace packages if you can help it
+- Avoid implicit or explicit namespace packages if you can help it
   - Otherwise, if you have to choose... well, you know the saying ;)
 
-I'll probably run this collection periodicially, and maybe even evolve it some. However,
+I'll probably run this collection periodically, and maybe even evolve it some. However,
 now I can get back to my hobby project, (and also my hobby project's hobby project (this)'s
 hobby project (building wheels where missing)).
