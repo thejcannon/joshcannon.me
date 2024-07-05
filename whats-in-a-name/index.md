@@ -8,7 +8,8 @@ excerpt: "Inspecting filenames of PyPI packages."
 Naming is important (as well as hard). Good names are good. Bad names are... bad.
 And we name a lot of things. In Python (a name) code is bundled and uploaded as a package 
 (another name), usually to the Python Package Index (PyPI, a third name). Inside of these
-packages is code. Most commonly, Python code (but they truly can contain anything).
+packages is code. Most commonly, Python code (but they truly can contain anything
+([like whole books](https://discuss.python.org/t/user-uploading-books-to-pypi-disguised-as-wheels/24096)).
 The only relationship between the package name and the module name(s) is the same as the 
 relationship between a cat's name and its demeanor. _Usually_ "fluffy" is a fluffy cat,
 but it's a convention. "Cupcake" could be the name of a very very naughty kitten.
