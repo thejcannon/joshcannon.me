@@ -71,7 +71,7 @@ magic incantations.
 ## Step 3: Let's have fun with data
 
 ([Link to online `datasette`](lite.datasette.io/?url=https%3A%2F%2Fthejcannon.github.io%2FPyPIPackageMapper%2Fpackage_database.sqlite)
-which all of the following links will use. I can't guarantee, however, the schema wont' change.
+which all of the following links will use. I can't guarantee, however, the schema won't change.
 )
 
 So, of the 7,893 packages scraped:
