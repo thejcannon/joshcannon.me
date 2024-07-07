@@ -11,6 +11,8 @@ footer-hover-col: "#E2725B"
 link-col: "#9A6B32"
 footer-link-col: "#CFB288"
 
+site-css: assets/css/site.css
+
 navbar-links:
   Now: "now"
 
