@@ -1,5 +1,5 @@
 ---
-title: "Remote Single-file Python scripts with uv"
+title: "Remote Single-file Python Scripts with uv"
 excerpt: "How supercharge your script running with uv tricks"
 ---
 
