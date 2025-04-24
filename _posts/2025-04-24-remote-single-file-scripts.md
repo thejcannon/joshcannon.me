@@ -56,7 +56,7 @@ NOTE: `uv` caches based on the URL, so if you want "evergreen" URLs (e.g. `refs/
 In this repo, is `scripts/claudesay.py`, therefore you should be able to run it like:
 
 ```bash
-uv run https://raw.githubusercontent.com/joshcannon/joshcannon.me/refs/heads/main/scripts/claudesay.py 'Certainly!'
+uv run -q --refresh https://raw.githubusercontent.com/thejcannon/joshcannon.me/refs/heads/main/scripts/claudesay.py 'Certainly!'
 ```
 
 And it just works!
