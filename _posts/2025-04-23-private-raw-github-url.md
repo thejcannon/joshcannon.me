@@ -1,5 +1,5 @@
 ---
-title: "Programmatically accessing (private) `raw.githubusercontent.com` URLs"
+title: "Programmatically accessing (private) GitHub file URLs"
 excerpt: "How to make it easy to access (private) single files from a github.com repo"
 ---
 
