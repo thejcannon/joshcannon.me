@@ -3,7 +3,7 @@ title: "Programmatically accessing (private) GitHub file URLs"
 excerpt: "How to make it easy to access (private) single files from a github.com repo"
 ---
 
-Given a `repo`, `ref` (like `refs/heads/<branch>` or `refs/tags/<tag>`), and `path`, how do we access the file?
+Given a `repo`, `ref` (like `refs/heads/<branch>` or `refs/tags/<tag>`), and `path`, how can I access the file?
 
 # Public repos
 
