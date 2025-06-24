@@ -1,5 +1,5 @@
 ---
-title: "How Python Generators (for the Systems-flovered folks)"
+title: "How Python Generators Work (for the Systems-flovered folks)"
 excerpt: 'AKA Watching the "A-HA" in realtime'
 ---
 
