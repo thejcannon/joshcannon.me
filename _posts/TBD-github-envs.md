@@ -6,22 +6,22 @@ excerpt: "(much like GitHub Secrets)"
 # Environments
 
 GitHub's Environments are closely tied to "Deployments". So much so I thought "huh this seems useless (for me)" and moved on.
-Perhaps I held this belief after seeing the 58 instances of "deployement" on the page describing Environments (which has 118 hits).
+Perhaps I held this belief after seeing the 58 instances of "deployment" on the page describing Environments (which has 118 hits).
 
 But, as I learned later Environments are actually quite useful outside of the world of Deployments, and inside the world of Security. That's because:
 
 > You can configure environments with protection rules and secrets. When a workflow job references an environment, the job won't start until all of the environment's protection rules pass. A job also cannot access secrets that are defined in an environment until all the deployment protection rules pass.
 
-It is hopefully well-known that GitHub Secrets are _barely_ secure. Of course the pages on ["About Secrets"](https://docs.github.com/en/actions/concepts/security/about-secrets) and ["Using Secrets in GitHub Actions"](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/using-secrets-in-github-actions) don't mention it, but ["Security hardening for GitHub Actions"](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-secrets) (what, you don't cross-search all your favorite technologies with "-hardening") does:
+It may not be well-known that GitHub Secrets are _barely_ secure. Of course the pages on ["About Secrets"](https://docs.github.com/en/actions/concepts/security/about-secrets) and ["Using Secrets in GitHub Actions"](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/using-secrets-in-github-actions) don't mention it, but ["Security hardening for GitHub Actions"](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-secrets) (what, you don't cross-search all your favorite technologies with "-hardening") does:
 
 > Any user with write access to your repository has read access to all secrets configured in your repository. Therefore, you should ensure that the credentials being used within workflows have the least privileges required.
 
-(way to bury the lede there!)
+**... has read access to all secrets**?! (way to bury the lede there!)
 
 ## For Security
 
-Environments CAN be used to _securely_ store secrets knowing that even users with write access can't
-(easily - depending on the overall security of your repo) access them. For security-purposes, they work like this:
+Environments can be used to _securely_ store secrets knowing that even users with write access can't
+(easily - depending on the overall security enforced by the repo's branch/tag protections) access them. For security-purposes, they work like this:
 
 - You make a GitHub Environment, let's call it `main`
 - You configure the "deployment" protection rules to restrict the "deployment" to just the `main` branch
@@ -51,7 +51,7 @@ An event whose sole purpose is to _trigger_ on Pull Request events, but with the
 So using `pull_request_target` means we CAN combine Environments with Pull Request events!
 
 However however however the _triggering_ branch is still the pull request base, so the environment is rejected.
-(So you get nothing! You LOSE! GOOD DAY SIR!)
+([You get NOTHING! You LOSE! GOOD DAY SIR!](https://youtu.be/M5QGkOGZubQ?si=CyZk7xO5X1X3JALJ))
 
 (I have an open ticket about this but I wouldn't hold my breath)
 
@@ -61,19 +61,22 @@ While I'm piling on GitHub, even if this "bug" was fixed, the lack of event symm
 
 ### Workaround(s)
 
-If your workflow is inherently safe for anyone to be able to trigger aribtrarily, one workaround is to use `workflow_dispatch`.
+If your workflow is inherently safe for anyone to be able to trigger arbitrarily, one workaround is to use `workflow_dispatch`.
 
-Simply use the `pull_request` and `workflow_dispatch` triggers, like so:
+you can combine `pull_request` and `workflow_dispatch` triggers, like so:
 
 ```yaml
 on:
   pull_request: ...
   workflow_dispatch:
     inputs:
-      pull-number: ...
+      pull-number:
+        type: number
+        required: true
 
 jobs:
   trigger-job:
+    if: github.event_name == 'pull_request'
     name: Trigger the workflow
     runs-on: ubuntu-latest
     permissions:
@@ -82,11 +85,15 @@ jobs:
       - run: gh workflow run <filename> --ref main -F pull-number=${{ github.event.pull_request.number }}
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
 
   the-job:
-    name: <NAME>
+    if: github.event_name == 'workflow_dispatch'
+    name: Name
     runs-on: ubuntu-latest
     environment: main
     steps: ...
 
 ```
+
+It's a hack, and not a very pretty or nice one. But it works in a pinch
