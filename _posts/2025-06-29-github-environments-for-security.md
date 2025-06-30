@@ -82,10 +82,10 @@ jobs:
     permissions:
       actions: write
     steps:
-      - run: gh workflow run <filename> --ref main -F pull-number=${{ github.event.pull_request.number }}
+      - run: gh workflow run <filename> --ref main -F pull-number=$\{{ github.event.pull_request.number }}
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: $\{{ github.token }}
+          GH_REPO: $\{{ github.repository }}
 
   the-job:
     if: github.event_name == 'workflow_dispatch'
