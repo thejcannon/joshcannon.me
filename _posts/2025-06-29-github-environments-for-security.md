@@ -6,7 +6,7 @@ excerpt: "(much like GitHub Secrets)"
 # Environments
 
 GitHub's Environments are closely tied to "Deployments". So much so I thought "huh this seems useless (for me)" and moved on.
-Perhaps I held this belief after seeing the 58 instances of "deployment" on the page describing Environments (which has 118 hits).
+Perhaps I held this belief after seeing the 58 instances of "deployment" on the page describing "Environments" (which has 118 hits).
 
 But, as I learned later Environments are actually quite useful outside of the world of Deployments, and inside the world of Security. That's because:
 
