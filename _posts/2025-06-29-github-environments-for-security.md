@@ -65,6 +65,7 @@ If your workflow is inherently safe for anyone to be able to trigger arbitrarily
 
 you can combine `pull_request` and `workflow_dispatch` triggers, like so:
 
+{% raw %}
 ```yaml
 on:
   pull_request: ...
@@ -95,6 +96,7 @@ jobs:
     steps: ...
 
 ```
+{% endraw %}
 
 It's a hack, and not a very pretty or nice one. But it works in a pinch
 
