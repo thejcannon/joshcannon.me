@@ -53,7 +53,7 @@ So using `pull_request_target` means we CAN combine Environments with Pull Reque
 However however however the _triggering_ branch is still the pull request base, so the environment is rejected.
 ([You get NOTHING! You LOSE! GOOD DAY SIR!](https://youtu.be/M5QGkOGZubQ?si=CyZk7xO5X1X3JALJ))
 
-(I have an open ticket about this but I wouldn't hold my breath)
+([I have an open ticket](https://github.com/thejcannon/ticket-3517845) about this but I wouldn't hold my breath)
 
 While I'm piling on GitHub, even if this "bug" was fixed, the lack of event symmetry means that
 `pull_request_review` and `pull_request_review_comment` events would still be left out by the roadside,
