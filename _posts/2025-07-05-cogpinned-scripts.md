@@ -41,6 +41,8 @@ While `uv` supports this with `uv lock --script`, it creates a separate lock fil
 
 # Solution
 
+Use `cog` to generate to pin the dependencies!
+
 ```python
 # /// script
 # dependencies = [
