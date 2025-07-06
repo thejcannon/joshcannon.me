@@ -47,11 +47,22 @@ Use `cog` to generate to pin the dependencies!
 # /// script
 # dependencies = [
 # # [[[cog
+# # import subprocess
 # # DEPENDENCIES = [
 # #     "cyclopts",
 # #     "httpx",
 # # ]
-# # cog.outl("\n".join(f'#   "{line}",' for line in __import__("subprocess").check_output("uv pip compile --no-annotate --no-header -", shell=True, text=True, input="\n".join(DEPENDENCIES)).splitlines()))
+# # cog.outl(
+# #     "\n".join(
+# #         f'#   "{line}",' for line in
+# #         subprocess.check_output(
+# #             "uv pip compile --no-annotate --no-header -",
+# #             shell=True,
+# #             text=True,
+# #             input="\n".join(DEPENDENCIES)
+# #         ).splitlines()
+# #     )
+# # )
 # # ]]]
 #   "anyio==4.9.0",
 #     "<the others omitted for brevity>",
