@@ -71,7 +71,8 @@ And now you can update (and pin) dependencies anytime with:
 uvx --from cogapp cog -r <path>
 ```
 
-Caveat: (when compared with a full lockfile) is the lack of hash support (if you're into supply-chain security).
+Caveat: When compared with a full lockfile we still lack features such as hash support
+(if you're into supply-chain security) and friends.
 However, incremental improvement is still improvement.
 
 # Bonus: Self-relocking
