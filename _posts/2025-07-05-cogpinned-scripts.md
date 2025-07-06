@@ -92,6 +92,7 @@ app.command(self_app)
 
 @self_app.command()
 def relock():
+    """Update this script's pinned dependencies."""
     subprocess.check_call(f"uvx --from cogapp cog -r {__file__}", shell=True)
     rich.print("[green]Relocked successfully[/green]")
 
