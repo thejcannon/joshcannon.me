@@ -52,8 +52,8 @@ Given this [flat layout](https://packaging.python.org/en/latest/discussions/src-
 
 | Contents / Invocation| `python -m macaroni.and_.cheese` | `python macaroni/and_/cheese.py` |
 | ------------- | ------------- | ------------- |
-| `from ..salad import dressing` | :tada:  | :x: `ImportError: attempted relative import with no known parent package` |
-| `from macaroni.salad import dressing` | :tada:  | :tada: |
+| `from ..salad import dressing` | 🎉  | 💥 `ImportError: attempted relative import with no known parent package` |
+| `from macaroni.salad import dressing` | 🎉  | 🎉 |
 
 # Why is that?
 
