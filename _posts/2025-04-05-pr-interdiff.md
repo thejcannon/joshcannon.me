@@ -72,3 +72,11 @@ git diff <tree-sha> <new-sha>
 ```
 
 And there you have it: a diff of diffs.
+
+# Bonus: Crankin' it to 11
+
+If your git server supports it (like GitHub does), fetch the SHAs using `git fetch --filter=blob:none <remote> <...>`.
+This will fetch just the tree information, and not the binary contents of the files. Then when you do `git merge-tree` and
+`git diff`, `git` will smartly choose whether (and which) blobs to fetch (if any).
+
+This can mean the difference between minutes and sub-seconds for large enough repositories.
