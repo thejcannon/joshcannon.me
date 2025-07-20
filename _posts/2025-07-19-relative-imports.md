@@ -29,7 +29,7 @@ Python has more than a few ways of running a "Python file":
   - then try to import the module named `sibling` (either `sibling/__init__.py` or `sibling.py`)
 - `from .sibling import boogers`: Same idea, but this time we need to load module `sibling` and attribute/submodule `boogers`
 - `from .. import uncle`: Imports `uncle` from under the grandparent directory (using similar rules)
-- `from ..uncle import tickles`: (you get the gist)
+- `from ..uncle import tickles`: (you get the jist)
 - `from ... import great_aunt`: ...
 
 These are all examples of _relative_ imports. What they import is _relative_ to the module importing them.
