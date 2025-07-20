@@ -80,3 +80,5 @@ This will fetch just the tree information, and not the binary contents of the fi
 `git diff`, `git` will smartly choose whether (and which) blobs to fetch (if any).
 
 This can mean the difference between minutes and sub-seconds for large enough repositories.
+(On my M1 Macbook, performing this operation on [this merge conflict resolution in the `cpython` repo](https://github.com/python/cpython/pull/136307/commits/c5a1146887bc182a46d56bb08c6f6cc67507ef32),
+took 2 minutes and downloaded 500MB without `--filter=blob:none` and 15s and 131MB with.
