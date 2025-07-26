@@ -15,16 +15,13 @@ Yet all 3 are mine (What can I say? I'm greedy at heart).
 
 # Work
 
-(Oh speaking of lucky) I work at [Anthropic](https://www.anthropic.com/). It's a dream job. Or as close as a full-time dayjob can qualify as such.
+My time at [Anthropic](https://www.anthropic.com/) comes to a close.
 
-I get to help some of the brightest minds in the field do incredible things, just by being somewhat of an expert in the ecosystem they call "home" (Python).
-I get to play with some really exciting bleeding-edge tech. And most importantly, I have a never-ending stream of interesting problems I solve by being "the right" kind of clever.
+I'm not quite sure what comes next, but I'm looking forward to it.
 
 # Open Source
 
-I still help maintain Pantsbuild, albeit less actively than at my last job.
-
-Otherwise I have a few personal projects irons in the fire, but nothing serious yet.
+My Open Source contributions have ebbed since joining Anthropic. I really do hope they flow soon.
 
 # Personal
 
