@@ -58,7 +58,7 @@ Given this [flat layout](https://packaging.python.org/en/latest/discussions/src-
 # Why is that?
 
 Buried in the Python docs' tutorials, in Chapter 6 "Modules", Section 4 "Packages", Subsection 2 "Intra-package References" ([6.4.2. here](https://docs.python.org/3/tutorial/modules.html#intra-package-references)),
-there is this paragraph[^1]:
+there is this paragraph [^1]:
 
 > Note that relative imports are based on the name of the current module’s package. Since the main module does not have a package, modules intended for use as the main module of a Python application must always use absolute imports.
 
@@ -69,6 +69,6 @@ which for the "main module" (the module being invoked), doesn't exist.
 
 ---
 
-[^1] The paragraph used to read:
+[^1]: The paragraph used to read
   > Note that relative imports are based on the name of the current module. Since the name of the main module is always `"__main__"`, modules intended for use as the main module of a Python application must always use absolute imports.
   However, this was slightly incorrect so I suggested a change in [PR 136846](https://github.com/python/cpython/pull/136846).
