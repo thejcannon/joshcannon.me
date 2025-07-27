@@ -69,6 +69,4 @@ which for the "main module" (the module being invoked), doesn't exist.
 
 ---
 
-[^1]: The paragraph used to read
-  > Note that relative imports are based on the name of the current module. Since the name of the main module is always `"__main__"`, modules intended for use as the main module of a Python application must always use absolute imports.
-  However, this was slightly incorrect so I suggested a change in [PR 136846](https://github.com/python/cpython/pull/136846).
+[^1]: The paragraph used to read differently, but it was also slightly incorrect so I suggested a change in [PR 136846](https://github.com/python/cpython/pull/136846).
