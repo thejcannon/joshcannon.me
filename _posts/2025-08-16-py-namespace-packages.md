@@ -14,7 +14,7 @@ I assume when you read "Python package" your first thought is of packages as fou
 ["module"](https://docs.python.org/3/tutorial/modules.html#modules) as well as a 
 ["package"](https://docs.python.org/3/tutorial/modules.html#packages), and `y` a "submodule" and a "subpackage".
 
-And now a tongue twister: "[Petr](https://github.com/encukou) promptly packaged Python package [`pello`](https://github.com/fedora-python/Pello/tree/master/pello) producing Python package `pello`, then published Python package `pello` containing Python package `pello` to the [Python Package Index](https://pypi.org/project/Pello/) promptly.
+And now a tongue twister: "[Petr](https://github.com/encukou) promptly packaged Python package [`pello`](https://github.com/fedora-python/Pello/tree/master/pello) producing Python package `pello`, then published Python package `pello` containing Python package `pello` to the [Python Package Index](https://pypi.org/project/Pello/) promptly."
 
 ...whew!
 
