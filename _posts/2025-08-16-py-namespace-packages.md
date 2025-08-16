@@ -85,7 +85,7 @@ So now we know what namespace packages aim to solve. Its a way to tell the impor
 to many (or none, depending on how you want to look at it) distribution packages, and all that entails.
 
 Historically, there were only _explicit_ namespace packages (I suspect at the time they were just called "namespace packages",
-and then PEP 420 came along and gave us _implicit_ namespace packages. Of course, the Zen of Python does say
+and then PEP 420 came along and gave us _implicit_ namespace packages). Of course, the Zen of Python does say
 "There should be one-- and preferably only one --obvious way to do it" but I'm not sure it applies here, given it isn't called
 "the Zen of Python Packaging". I suspect that rule was skipped over and the rule which reads 
 "Namespaces are one honking great idea -- let's do more of those!" was instead double-clicked on.
