@@ -63,7 +63,7 @@ The reason the code in your `site-packages` is found when you `import` is due to
 It works kinda like this:
 
 - Given a module (like `gooble`), iterate through the paths in `sys.path` trying to find a valid `gooble` module underneath.
-  This may look like `gooble.py` or `gooble/__init__.py` or any of the other valid ways of defining a Python module on disk.
+  This may look like `gooble/__init__.py` or `gooble.py` or any of the other valid ways of defining a Python module on disk.
 - Given a submodule (like `gooble.firewall`), first load module `gooble`, take the path we found it at (`__path__`) and look
   underneath for submodule `firewall`.
 
