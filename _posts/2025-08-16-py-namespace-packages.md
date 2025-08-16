@@ -48,7 +48,7 @@ Let's say you're a megacorp named Gooble and you want all of your code to be kno
 all of your modules to start with `gooble.`. You now have a choice. Put everything inside of one distribution package named
 `gooble` (combining code for your Earth Engine with Big Lake code along with your Cloud APIs - 
 much to the confusion of Hydrologists everywhere). Or split things into logical sections, each _sharing_ a piece of 
-the `gooble.` pie, making `gooble` is a namespace package.
+the `gooble.` pie, making `gooble` a namespace package.
 
 You may be thinking "ok, so what's the big deal?" - and in most "vanilla" cases there'd be no big deal. Most of the time you
 install a Python package, it goes into some `site-packages` directory along with all its installed brothers and sisters
