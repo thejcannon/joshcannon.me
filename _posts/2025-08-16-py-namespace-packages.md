@@ -106,17 +106,17 @@ pkg_resources.declare_namespace(__name__)
 These use `__path__` shenanigans to trick the Python import machinery into searching additional directories when
 searching for submodules.
 
-It is important to note that one quirk of this solution is that _every_ `gooble/__init__py` in _every_ distribution package
+It is important to note that one quirk of this solution is that _every_ `gooble/__init__.py` in _every_ distribution package
 MUST agree on doing this. Otherwise, if `gooble-cloud-walk` accidentally shipped an empty `gooble/__init__.py` _AND_ it had
 an "early" `sys.path` entry, then it claims the import package `gooble` all to itself.
 
-Remember these are the "old" way.
+(Remember this way is the "legacy" way)
 
 ## Implicit Namespace Packages
 
 PEP 420 gave us a (better) alternative, implicit namespace packages. These are easy to make and easy to explain.
 Just don't make `gooble/__init__.py`. Easy peasy lemon squeezy. The import machinery was changed to allow this
-new way of saying "hey keep looking for `gooble.cloud_build`.
+new way of saying "hey keep looking for `gooble.cloud_build` if `gooble/` has no `__init__.py`.
 
 We still have to make sure every `gooble` distribution package agrees _NOT_ to contain the file, but now we don't have
 to worry about multiple distribution packages containing the same path.
@@ -128,7 +128,7 @@ to worry about multiple distribution packages containing the same path.
 Unfortunately, both _explicit_ and _implicit_ namespace packages still exist today - meaning we have two ways of accomplishing
 the same thing (two strikes against "the Zen"  - one for having "one obvious way" and one for "explicit is better than implicit").
 
-Secondly, newcomers (or forgetful old-timers) might omit the `__init__.py` and now implicitly have an implicit namespace package.
+Secondly, newcomers (or forgetful old-timers) might omit the `__init__.py` and now implicitly have an implicit namespace package 
 (as opposed to someone adhering to PEP 420 and explicitly having an implicit namespace package).
 There's also a slight import performance hit when doing this (but likely not enough to matter).
 
