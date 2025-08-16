@@ -39,6 +39,9 @@ A better definition might be
 
 > A package which serves only as a container for subpackages. \[...]
 
+This is the most correct, in my opinion, because Python import packages don't have to come from directories on disk.
+They may also come from other exotic places like [zip archives](https://docs.python.org/3/library/zipimport.html).
+
 ## Rationale
 
 Let's say you're a megacorp named Gooble and you want all of your code to be known to be Gooble code so you'd prefer
