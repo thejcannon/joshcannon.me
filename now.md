@@ -17,7 +17,7 @@ Yet all 3 are mine (What can I say? I'm greedy at heart).
 
 My time at [Anthropic](https://www.anthropic.com/) came to a close August of 2025.
 
-My time at Airbnb will start in September of '25. I'm pretty pleased and excited.
+My time at [Airbnb](https://www.airbnb.com/) will start in September of '25. I'm pretty pleased and excited.
 
 # Open Source
 
@@ -28,8 +28,8 @@ My Open Source contributions have ebbed since joining Anthropic. I really do hop
 Since my time with Anthropic has ended, I've found my personal interests have gotten some airtime.
 
 I was recently obsessed with a photograph a friend of mine, Sydney Johnson, took of downtown Austin and decided
-to turn it into laser layer art. Since that, I've decided to work more on the laser cutting/engraving
-since it is a rewarding and inexpensive hobby.
+to turn it into [laser layer art](./assets/austin-laser.jpg). 
+Since that, I've decided to work more on the laser cutting/engraving since it is a rewarding and inexpensive hobby.
 
 Past (and potentially future, again) hobbies include:
 
