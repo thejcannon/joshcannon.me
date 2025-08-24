@@ -54,7 +54,7 @@ the other (not-aribitrary-but-not-required) ones. Not only can it get overwhelmi
 
 GitHub's UX changes if you have failing NOT required status checks. The nice green merge button (the one that feels SO GOOD to click)
 turns into a clickable-but-greytone one. I can't count the number of times I've had to help people in realizing the button is clickable,
-it just isn't _green_. I'm also pretty sure as every company matures they make a set of userscripts of a Chrome Extension just for GitHub,
+it just isn't _green_. I'm also pretty sure as every company matures they make a set of [Userscripts](https://en.wikipedia.org/wiki/Userscript) or a Chrome Extension just for GitHub,
 and _this_ is the first piece of functionality.
 
 ## Context is Key
@@ -73,7 +73,7 @@ Or if you want to rename/change the context, good luck!
 Since commit statuses are sent to commit SHAs that means the relationship between the Pull Request and the "required" statuses
 is the same relationship between a branch and a commit.
 
-In the case of Pull Requests, let's say we have a check that the PR description includes a reference to HeadOn ("Apply directly to the forehead").
+In the case of Pull Requests, let's say we have a check that the PR description includes a reference to [HeadOn](https://en.wikipedia.org/wiki/HeadOn) ("Apply directly to the forehead").
 And I open a PR against the default branch omitting the reference. I presumably get a failing commit status check and can't merge my PR.
 Then, because our development cycle is weird I also have to open the same change against the `superbowl` feature branch, so I do, remembering
 the required reference. I get a passing commit status check (apply directly to the commit SHA).
