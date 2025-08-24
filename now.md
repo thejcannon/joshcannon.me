@@ -15,9 +15,9 @@ Yet all 3 are mine (What can I say? I'm greedy at heart).
 
 # Work
 
-My time at [Anthropic](https://www.anthropic.com/) comes to a close.
+My time at [Anthropic](https://www.anthropic.com/) came to a close August of 2025.
 
-I'm not quite sure what comes next, but I'm looking forward to it.
+My time at Airbnb will start in September of '25. I'm pretty pleased and excited.
 
 # Open Source
 
@@ -25,12 +25,13 @@ My Open Source contributions have ebbed since joining Anthropic. I really do hop
 
 # Personal
 
-With the updates from the above, I hope it doesn't surprise you that this section has dwindled to almost none.
+Since my time with Anthropic has ended, I've found my personal interests have gotten some airtime.
 
-Outside of whatever Sanderson novel revently came out I'm mostly just doing family or work. And that is sufficient for me.
+I was recently obsessed with a photograph a friend of mine, Sydney Johnson, took of downtown Austin and decided
+to turn it into laser layer art. Since that, I've decided to work more on the laser cutting/engraving
+since it is a rewarding and inexpensive hobby.
 
 Past (and potentially future, again) hobbies include:
 
-- Laser cutting/engraving
 - Cross-stitching
 - Long-distance running
