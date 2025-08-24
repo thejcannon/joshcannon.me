@@ -63,7 +63,7 @@ Lastly, everything is keyed off of the (aribtrary) `context` in the payload.
 
 A new status with the same context (but different state or description) just overwrites the previous one.
 
-If you're adding a new required status - hope your opened (and currently mergeable) PRs have a passing 
+If you're adding a new required status - hope all of your opened opened (and currently mergeable) PRs have a passing 
 status already.
 
 Or if you want to rename/change the context, good luck!
