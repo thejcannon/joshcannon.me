@@ -43,7 +43,7 @@ gh api \
 
 From a security standpoint, required checks are configured along with the GitHub App they are expected to come from.
 Meaning if you're expecting the required "passes security checks" commit status to come from the GitHub App "Scruff McGruff",
-having a passing status from another GitHub App, or from a user, will not be honored.
+a passing status from another GitHub App, or from a user, will not be honored.
 
 The status will of course still exist and be displayed, which is some sucky UI/UX. Speaking of...
 
