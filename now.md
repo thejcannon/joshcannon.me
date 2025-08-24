@@ -28,7 +28,7 @@ My Open Source contributions have ebbed since joining Anthropic. I really do hop
 Since my time with Anthropic has ended, I've found my personal interests have gotten some airtime.
 
 I was recently obsessed with a photograph a friend of mine, Sydney Johnson, took of downtown Austin and decided
-to turn it into [laser layer art](./assets/austin-laser.jpg). 
+to turn it into [laser layer art](/assets/images/austin-laser.jpg). 
 Since that, I've decided to work more on the laser cutting/engraving since it is a rewarding and inexpensive hobby.
 
 Past (and potentially future, again) hobbies include:
