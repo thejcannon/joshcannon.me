@@ -37,7 +37,7 @@ gh api \
   /repos/{owner}/{repo}/statuses/{SHA} \
    -f 'state=failure' \
    -f 'target_url=https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDkwajRocjlpazJ6NXIzbXRlbWg1ZThneml5NzQ4a29sajZkcmZ6MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/owRSsSHHoVYFa/giphy.gif' \
-   -f 'description=YOU DIDN'T SAY THE MAGIC WORD' \
+   -f 'description=YOU DIDNT SAY THE MAGIC WORD' \
    -f 'context=i-hate-this-hacker-crap'
 ```
 
