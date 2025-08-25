@@ -27,8 +27,8 @@ before it is able to merge.
 
 ## Arbitrary, arbitrary. Everything is arbitrary.
 
-The APIs for commit statuses aren't limited to apps and contexts aren't limited and whose URLs aren't limited and which are only
-limited to those with write access to the repository.
+The APIs for commit statuses aren't limited to apps, and contexts aren't limited by anything, and URLs aren't limited, 
+and API callers are only limited to those with write access to the repository.
 
 Feeling bored and want to mess with your peers? Pick a PR, grab the SHA and...
 
