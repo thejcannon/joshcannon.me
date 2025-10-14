@@ -14,7 +14,7 @@ Now all you can control is one thing: do you let them hunker down in separate ro
 
 ...this isn't about "Return to Office." It's about monorepos!
 
-And TL;DR: The more you co-locate, the more you co-operate and collaborate.
+And TL;DR: The more you co-locate, the more you co-operate and co-llaborate.
 
 ---
 
