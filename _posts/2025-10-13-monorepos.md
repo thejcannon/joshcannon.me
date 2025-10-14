@@ -3,7 +3,7 @@ title: The Programmer's Dilemma
 subtitle: A different take on "locality"
 ---
 
-Imagine for a moment you had to get a group of 50 random adult human beings
+Imagine for a moment you had to get a group of 100 random adult human beings
 to perform a task that involves groups of them working together 
 (and if you really want to succeed, groups would also need to work with other groups).
 
