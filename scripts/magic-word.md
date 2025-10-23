@@ -4,4 +4,4 @@ See https://joshcannon.me/2025/10/22/executable-markdown.html
 
 or if you're feeling brave...
 
-`curl https://raw.githubusercontent.com/thejcannon/joshcannon.me/refs/heads/main/scripts/magic-word.md | sh`
+`curl -s https://raw.githubusercontent.com/thejcannon/joshcannon.me/refs/heads/main/scripts/magic-word.md | sh`
