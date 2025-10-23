@@ -1,15 +1,14 @@
-[ \]; exec /usr/bin/env open 'https://www.youtube.com/watch?v=RfiQYRn7fBg'; ]:#
 ---
 title: Making executable markdown files
-subtitle: This blog post is executable
+subtitle: Because its useful (kinda)
 ---
 
-In the pursuit of something itself worthy of a (future0 blog post,
+In the pursuit of something itself worthy of a (future) blog post,
 I foud myself wanting to have "exeuctable" markdown files.
 
 TL;DR `[ \]; exec <COMMAND> $0 "$@"; ]:#`
 
-Try it! `curl -s https://raw.githubusercontent.com/thejcannon/joshcannon.me/refs/heads/main/_posts/2025-10-22-executable-markdown.md | sh`
+Try it! `curl https://raw.githubusercontent.com/thejcannon/joshcannon.me/refs/heads/main/scripts/magic-word.md | sh`
 
 (or save it to a file, `chmod +x` it, then run it)
 
