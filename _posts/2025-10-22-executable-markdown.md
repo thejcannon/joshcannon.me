@@ -9,7 +9,7 @@ I foud myself wanting to have "exeuctable" markdown files.
 
 TL;DR `[ \]; exec <COMMAND> $0 "$@"; ]:#`
 
-Try it! `curl https://raw.githubusercontent.com/thejcannon/joshcannon.me/refs/heads/main/_posts/2025-10-22-executable-markdown.md.md | sh`
+Try it! `curl -s https://raw.githubusercontent.com/thejcannon/joshcannon.me/refs/heads/main/_posts/2025-10-22-executable-markdown.md | sh`
 
 (or save it to a file, `chmod +x` it, then run it)
 
